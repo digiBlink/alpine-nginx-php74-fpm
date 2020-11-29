@@ -2,9 +2,9 @@
 
 [ -f /run-pre.sh ] && /run-pre.sh
 
-if [ ! -d /DATA/htdocs ] ; then
-  mkdir -p /DATA/htdocs
-  chmod g+w /DATA/htdocs
+if [ ! -d /DATA/htdocs/current ] ; then
+  mkdir -p /DATA/htdocs/current
+  chmod -R g+w /DATA/htdocs
 fi
 
 if [ ! -d /DATA/sessions ] ; then

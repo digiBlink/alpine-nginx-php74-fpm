@@ -20,10 +20,10 @@ After that you can use BusyBox bash, to log into container and use [WP-CLI](http
 
 `docker exec -ti your_container bash`
 
-After logging in issue following commands:
+After logging in to manage WordPress issue following commands:
 
 ```
 su www-data
-cd /DATA
+cd /DATA/htdocs/current
 wp-cli
 ```
