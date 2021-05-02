@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM alpine:3.13
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -30,9 +30,6 @@ RUN apk add --no-cache \
 RUN set -eux; \
     adduser -u 82 -D -h /DATA -S -G www-data www-data -s /bin/bash
 # 82 is the standard uid/gid for "www-data" in Alpine
-# https://git.alpinelinux.org/aports/tree/main/apache2/apache2.pre-install?h=3.9-stable
-# https://git.alpinelinux.org/aports/tree/main/lighttpd/lighttpd.pre-install?h=3.9-stable
-# https://git.alpinelinux.org/aports/tree/main/nginx/nginx.pre-install?h=3.9-stable
 
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
@@ -57,9 +54,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
 ENV GPG_KEYS 42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312
 
-ENV PHP_VERSION 7.4.12
-ENV PHP_URL="https://www.php.net/distributions/php-7.4.12.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.4.12.tar.xz.asc"
-ENV PHP_SHA256="e82d2bcead05255f6b7d2ff4e2561bc334204955820cabc2457b5239fde96b76"
+ENV PHP_VERSION 7.4.18
+ENV PHP_URL="https://www.php.net/distributions/php-7.4.18.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.4.18.tar.xz.asc"
+ENV PHP_SHA256="ab97f22b128d21dcbc009b50a37aaea0051b2721cbcd122d9e00e6ffc3c4b7e1"
 
 RUN set -eux; \
     \
