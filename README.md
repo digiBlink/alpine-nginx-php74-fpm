@@ -4,10 +4,10 @@ Maintained by [digiBlink](https://digiblink.eu) - [docker hub link](https://hub.
 
 Container with:
 
-* Alpine Linux 3.13
-* nginx 1.18.0-r13
-* PHP-FPM 7.4.18 (all necessary extensions to be ready for Wordpress deployment)
-* WP-CLI 2.4.0
+* Alpine Linux 3.14
+* nginx 1.20.2-r0
+* PHP-FPM 7.4.26 (all necessary extensions to be ready for Wordpress deployment)
+* WP-CLI 2.5.0
 * git, bash
 
 ## Usage
