@@ -5,9 +5,9 @@ Maintained by [digiBlink](https://digiblink.eu) - [docker hub link](https://hub.
 Container with:
 
 * Alpine Linux 3.16
-* nginx 1.22.0-r0
-* PHP-FPM 7.4.30 (all necessary extensions to be ready for Wordpress deployment)
-* WP-CLI 2.6.0
+* nginx 1.22.0-r1
+* PHP-FPM 7.4.32 (all necessary extensions to be ready for Wordpress deployment)
+* WP-CLI 2.7.0
 * git, bash
 
 ## Usage
