@@ -14,8 +14,7 @@ ENV PHPIZE_DEPS \
         re2c
 
 # persistent / runtime deps
-RUN apk upgrade -U && \
-    apk add --no-cache \
+RUN apk add --no-cache \
         nginx \
         ca-certificates \
         bash \
@@ -215,6 +214,7 @@ ENV TERM="xterm" \
 ENV PATH /DATA/bin:$PATH
 
 RUN set -eux; \
+    apk upgrade -U; \
     cd /usr/local/etc; \
     if [ -d php-fpm.d ]; then \
         # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
