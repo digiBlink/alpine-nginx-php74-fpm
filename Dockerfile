@@ -14,7 +14,7 @@ ENV PHPIZE_DEPS \
         re2c
 
 # persistent / runtime deps
-RUN apk add --no-cache \
+RUN apk add -U --no-cache \
         nginx \
         ca-certificates \
         bash \
