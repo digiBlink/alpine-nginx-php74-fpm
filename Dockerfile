@@ -23,7 +23,7 @@ RUN apk add -U --no-cache \
         tar \
         xz \
         git \
-        libressl \
+        openssl \
         openssh
 
 # ensure www-data user exists
@@ -93,9 +93,9 @@ RUN set -eux; \
         coreutils \
         curl-dev \
         libedit-dev \
-        libressl-dev \
         libsodium-dev \
         libxml2-dev \
+        openssl-dev \
         linux-headers \
         libzip-dev \
         oniguruma-dev \
@@ -108,8 +108,15 @@ RUN set -eux; \
         CPPFLAGS="$PHP_CPPFLAGS" \
         LDFLAGS="$PHP_LDFLAGS" \
     ; \
-    docker-php-source extract; \
-    cd /usr/src/php; \
+    docker-php-source extract
+
+WORKDIR /usr/src/php
+
+RUN apk add patch
+
+COPY files/php-7.4.26-openssl3.patch /usr/src
+
+RUN patch -p1 < ../php-7.4.26-openssl3.patch; \
     gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
     ./configure \
         --build="$gnuArch" \
