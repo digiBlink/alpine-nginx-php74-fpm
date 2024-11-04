@@ -2,7 +2,7 @@ FROM alpine:3.20
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
-ENV PHPIZE_DEPS \
+ENV PHPIZE_DEPS="\
         autoconf \
         dpkg-dev dpkg \
         file \
@@ -11,7 +11,7 @@ ENV PHPIZE_DEPS \
         libc-dev \
         make \
         pkgconf \
-        re2c
+        re2c"
 
 # persistent / runtime deps
 RUN apk add -U --no-cache \
@@ -31,7 +31,7 @@ RUN set -eux; \
     adduser -u 82 -D -h /DATA -S -G www-data www-data -s /bin/bash
 # 82 is the standard uid/gid for "www-data" in Alpine
 
-ENV PHP_INI_DIR /usr/local/etc/php
+ENV PHP_INI_DIR="/usr/local/etc/php"
 RUN set -eux; \
     mkdir -p "$PHP_INI_DIR/conf.d"; \
 # allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
@@ -40,7 +40,7 @@ RUN set -eux; \
     chown www-data:www-data /var/www/html; \
     chmod 777 /var/www/html
 
-ENV PHP_EXTRA_CONFIGURE_ARGS --enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --disable-cgi
+ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --disable-cgi"
 
 # Apply stack smash protection to functions using local buffers and alloca()
 # Make PHP's main executable position-independent (improves ASLR security mechanism, and has no performance impact on x86_64)
@@ -54,7 +54,7 @@ ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
 ENV GPG_KEYS 42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312
 
-ENV PHP_VERSION 7.4.33
+ENV PHP_VERSION="7.4.33"
 ENV PHP_URL="https://www.php.net/distributions/php-7.4.33.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.4.33.tar.xz.asc"
 ENV PHP_SHA256="924846abf93bc613815c55dd3f5809377813ac62a9ec4eb3778675b82a27b927"
 
@@ -218,7 +218,7 @@ ENV TERM="xterm" \
     DB_USER=""\
     DB_PASS=""
 
-ENV PATH /DATA/bin:$PATH
+ENV PATH="/DATA/bin:$PATH"
 
 RUN set -eux; \
     apk upgrade -U; \
