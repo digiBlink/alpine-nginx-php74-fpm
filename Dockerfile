@@ -48,10 +48,12 @@ ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=www-data --with-fpm-g
 # Enable linker optimization (this sorts the hash buckets to improve cache locality, and is non-default)
 # https://github.com/docker-library/php/issues/272
 # -D_LARGEFILE_SOURCE and -D_FILE_OFFSET_BITS=64 (https://www.php.net/manual/en/intro.filesystem.php)
-# -Wno-incompatible-pointer-types: PHP 7.4's bundled ext/libxml uses the pre-2.12
-# (non-const) libxml2 error-handler signature. GCC 14+ (Alpine 3.24 ships GCC 15)
-# promotes that mismatch from a warning to a hard error, so downgrade it back.
-ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-incompatible-pointer-types"
+# Alpine 3.24 ships GCC 15, which breaks the EOL PHP 7.4 source two ways:
+#  - -std=gnu17: GCC 15 defaults to C23, where an empty param list means "no args".
+#    ext/gd calls old-style unprototyped function pointers with args, so pin C17.
+#  - -Wno-* : GCC 14 promoted several warnings to hard errors (e.g. ext/libxml's
+#    pre-2.12, non-const libxml2 error-handler signature). Downgrade them back.
+ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -std=gnu17 -Wno-incompatible-pointer-types -Wno-implicit-function-declaration -Wno-int-conversion"
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
@@ -122,6 +124,7 @@ COPY files/php-7.4.26-openssl3.patch /usr/src
 RUN set -eux; \
     patch -p1 < ../php-7.4.26-openssl3.patch; \
     gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+    export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS"; \
     ./configure \
         --build="$gnuArch" \
         --with-config-file-path="$PHP_INI_DIR" \
@@ -160,9 +163,9 @@ RUN set -eux; \
         --with-jpeg \
         --enable-opcache \
         \
-# in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
-# ... and are removed in PHP 8+; see also https://github.com/docker-library/php/pull/847#issuecomment-505638229
-        --with-pear \
+# PEAR/PECL is intentionally not built: PHP 7.4's bundled PEAR installer fails on
+# Alpine 3.24 (libxml2 >=2.12 rejects PEAR's package.xml). This image only needs
+# WordPress + WP-CLI; shared extensions (sodium) are enabled via docker-php-ext-enable.
         \
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
@@ -191,10 +194,6 @@ RUN set -eux; \
     apk add --no-cache $runDeps; \
     \
     apk del --no-network .build-deps; \
-    \
-# update pecl channel definitions https://github.com/docker-library/php/issues/443
-    pecl update-channels; \
-    rm -rf /tmp/pear ~/.pearrc; \
     \
 # smoke test
     php --version
