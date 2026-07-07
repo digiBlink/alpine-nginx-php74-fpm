@@ -48,7 +48,10 @@ ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=www-data --with-fpm-g
 # Enable linker optimization (this sorts the hash buckets to improve cache locality, and is non-default)
 # https://github.com/docker-library/php/issues/272
 # -D_LARGEFILE_SOURCE and -D_FILE_OFFSET_BITS=64 (https://www.php.net/manual/en/intro.filesystem.php)
-ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+# -Wno-incompatible-pointer-types: PHP 7.4's bundled ext/libxml uses the pre-2.12
+# (non-const) libxml2 error-handler signature. GCC 14+ (Alpine 3.24 ships GCC 15)
+# promotes that mismatch from a warning to a hard error, so downgrade it back.
+ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-incompatible-pointer-types"
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
@@ -116,7 +119,8 @@ RUN apk add patch
 
 COPY files/php-7.4.26-openssl3.patch /usr/src
 
-RUN patch -p1 < ../php-7.4.26-openssl3.patch; \
+RUN set -eux; \
+    patch -p1 < ../php-7.4.26-openssl3.patch; \
     gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
     ./configure \
         --build="$gnuArch" \
